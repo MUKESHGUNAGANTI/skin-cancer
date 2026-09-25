@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skin Cancer Detection</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-200 via-pink-100 to-blue-200">
+  <div class="max-w-md w-full bg-white shadow-xl rounded-2xl p-8 text-center border border-purple-300">
+    <h1 class="text-2xl font-bold text-purple-700 mb-4">Skin Cancer Detection</h1>
+
+    <!-- Upload Form -->
+    <form id="uploadForm" action="/predict" method="post" enctype="multipart/form-data">
+      <label for="file-upload" 
+             class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-purple-400 rounded-xl cursor-pointer bg-purple-50 hover:bg-purple-100 transition">
+        <input id="file-upload" type="file" name="file" class="hidden" accept="image/*" required />
+        <svg class="w-10 h-10 text-purple-500 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6h.1a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+        <p class="text-purple-600 font-medium">Click or Drag to Upload Image</p>
+      </label>
+
+      <!-- Image Preview -->
+      <div id="preview-container" class="mt-4 {% if not image_path %}hidden{% endif %}">
+        <img id="preview-image" 
+             src="{% if image_path %}{{ url_for('static', filename='uploads/' + image_path.split('/')[-1]) }}{% endif %}" 
+             alt="Uploaded Image" class="mx-auto rounded-lg shadow-md w-56">
+      </div>
+
+      <button type="submit" 
+              class="mt-6 w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl shadow-md transition">
+        🔍 Detect Skin Cancer
+      </button>
+    </form>
+
+    <!-- Display Result -->
+    {% if result %}
+      <div class="mt-4 text-xl font-semibold text-gray-700">
+        <span class="text-purple-700">Prediction:</span> {{ result }}
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file-upload');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImage.src = e.target.result;
+          previewContainer.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewContainer.classList.add('hidden');
+        previewImage.src = '';
+      }
+    });
+  </script>
+</body>
+</html>
